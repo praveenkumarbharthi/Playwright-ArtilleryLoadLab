@@ -1,0 +1,52 @@
+# Artillery + Playwright Multi-Browser Load Configuration
+# Targets concurrent browser performance testing with Core Web Vitals (including INP).
+
+config:
+  target: "https://www.saucedemo.com"
+  processor: "./sauce-demo-flow.js"
+  variables:
+    username: "{{ $env.SAUCE_USERNAME }}"
+    password: "{{ $env.SAUCE_PASSWORD }}"
+  engines:
+    playwright:
+      launchOptions:
+        headless: true
+        args:
+          - "--no-sandbox"
+          - "--disable-setuid-sandbox"
+          - "--disable-dev-shm-usage"
+          - "--disable-gpu"
+      contextOptions:
+        viewport:
+          width: 1280
+          height: 720
+      extendedMetrics: true
+      defaultNavigationTimeout: 30
+      stripQueryString: true
+  environments:
+    # Fast local sanity check: 2 VUs over 10 seconds.
+    smoke:
+      phases:
+        - name: smoke
+          duration: 10
+          arrivalCount: 2
+    # Concurrent load profile suitable for local machine execution.
+    load:
+      phases:
+        - name: ramp-and-sustain
+          duration: 30
+          arrivalRate: 1
+          maxVusers: 3
+    # Larger browser-based sample for trend analysis; run only against a target
+    # where this traffic is authorized and acceptable.
+    performance:
+      phases:
+        - name: ramp-and-sustain
+          duration: 120
+          arrivalRate: 2
+          maxVusers: 20
+
+scenarios:
+  - name: sauce-demo-purchase
+    engine: playwright
+    testFunction: sauceDemoPurchaseFlow

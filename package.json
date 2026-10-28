@@ -1,0 +1,23 @@
+{
+  "name": "playwright-artillery-poc",
+  "version": "1.0.0",
+  "description": "Multi-browser concurrent UI performance testing using Playwright and Artillery.",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node scripts/run-playwright.js",
+    "test:single": "node scripts/run-playwright.js",
+    "test:unit": "node --test scripts/build-dashboard.test.js scripts/report-run.test.js",
+    "artillery:smoke": "node scripts/run-artillery.js smoke",
+    "artillery:load": "node scripts/run-artillery.js load",
+    "artillery:performance": "node scripts/run-artillery.js performance",
+    "report": "node scripts/build-dashboard.js",
+    "all": "node scripts/run-all.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "artillery": "2.0.26"
+  }
+}
