@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-10-28T15:16:00.918Z",
+  "totalMs": 4342,
+  "thresholdMs": 8000,
+  "passed": true,
+  "steps": {
+    "goto-login-page": 3464,
+    "login-to-inventory-ready": 388,
+    "add-to-cart-to-badge-updated": 98,
+    "open-cart-to-item-verified": 83,
+    "open-checkout-form": 57,
+    "checkout-form-to-overview": 173,
+    "checkout-submit-to-confirmation-visible": 79
+  }
+}

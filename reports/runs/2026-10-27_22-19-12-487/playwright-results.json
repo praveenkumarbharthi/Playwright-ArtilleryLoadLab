@@ -1,0 +1,149 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Praveen_Kumar\\Downloads\\New folder\\workspace\\playwright-artillery-poc\\playwright.config.js",
+    "rootDir": "C:/Users/Praveen_Kumar/Downloads/New folder/workspace/playwright-artillery-poc/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\Praveen_Kumar\\Downloads\\New folder\\workspace\\playwright-artillery-poc\\reports\\runs\\2026-10-27_22-19-12-487\\playwright-results.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "C:\\Users\\Praveen_Kumar\\Downloads\\New folder\\workspace\\playwright-artillery-poc\\reports\\runs\\2026-10-27_22-19-12-487\\playwright-report"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Praveen_Kumar/Downloads/New folder/workspace/playwright-artillery-poc/reports/runs/2026-10-27_22-19-12-487/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/Praveen_Kumar/Downloads/New folder/workspace/playwright-artillery-poc/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "sauce-demo-journey.spec.js",
+      "file": "sauce-demo-journey.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "SauceDemo purchase journey (single-user baseline timings)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1500,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "steps": [
+                    {
+                      "title": "goto-login-page",
+                      "duration": 426
+                    },
+                    {
+                      "title": "login-to-inventory-ready",
+                      "duration": 171
+                    },
+                    {
+                      "title": "add-to-cart-to-badge-updated",
+                      "duration": 42
+                    },
+                    {
+                      "title": "open-cart-to-item-verified",
+                      "duration": 160
+                    },
+                    {
+                      "title": "open-checkout-form",
+                      "duration": 155
+                    },
+                    {
+                      "title": "checkout-form-to-overview",
+                      "duration": 178
+                    },
+                    {
+                      "title": "checkout-submit-to-confirmation-visible",
+                      "duration": 149
+                    }
+                  ],
+                  "startTime": "2026-10-27T16:49:14.360Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "105cc36b8fb0641b8598-7636b2eb2524f1e80f48",
+          "file": "sauce-demo-journey.spec.js",
+          "line": 11,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-27T16:49:13.582Z",
+    "duration": 2505.6279999999997,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

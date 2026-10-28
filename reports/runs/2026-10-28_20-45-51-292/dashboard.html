@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UI Performance Dashboard - Playwright + Artillery</title>
+  <style>
+:root {
+  --bg: #0f172a;
+  --bg-elevated: #1e293b;
+  --card: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --pass: #22c55e;
+  --fail: #ef4444;
+  --warn: #f59e0b;
+  --bar: #38bdf8;
+  --bar-p95: #f97316;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+  line-height: 1.45;
+}
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+h1 { margin: 0 0 8px; font-size: 28px; }
+h2 { margin: 0 0 12px; font-size: 18px; }
+.sub { color: var(--muted); margin: 0; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.badge.pass { background: rgba(34, 197, 94, 0.15); color: var(--pass); border: 1px solid var(--pass); }
+.badge.fail { background: rgba(239, 68, 68, 0.15); color: var(--fail); border: 1px solid var(--fail); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
+.card .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table-wrap { overflow-x: auto; }
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+td code { overflow-wrap: anywhere; }
+.ok { color: var(--pass); font-weight: 700; }
+.bad { color: var(--fail); font-weight: 700; }
+.meter {
+  height: 10px;
+  background: #0b1220;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.meter > span { display: block; height: 100%; background: var(--bar); }
+.meter.p95 > span { background: var(--bar-p95); }
+.bar-row { display: grid; grid-template-columns: 240px 1fr 80px; gap: 10px; align-items: center; margin: 8px 0; }
+.note { color: var(--muted); font-size: 13px; }
+footer { margin-top: 32px; color: var(--muted); font-size: 12px; }
+code { background: #0b1220; padding: 1px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    
+    <div class="hero">
+      <div>
+        <h1>Playwright + Artillery UI Performance</h1>
+        <p class="sub">Multi-browser concurrent percentiles and Core Web Vitals (including official INP). Generated 1793200573382</p>
+      </div>
+      <span class="badge pass">passed</span>
+    </div>
+
+    <div class="grid">
+      <div class="card"><div class="label">VUs Launched</div><div class="value">30</div><div class="hint">Total browser sessions</div></div>
+      <div class="card"><div class="label">Completed VUs</div><div class="value">30</div><div class="hint">Finished purchase flows</div></div>
+      <div class="card"><div class="label">Failed VUs</div><div class="value">0</div><div class="hint">0 session errors</div></div>
+      <div class="card"><div class="label">Baseline Journey</div><div class="value">4342 ms</div><div class="hint">Single-user timing reference</div></div>
+      <div class="card"><div class="label">Concurrent Journey p95</div><div class="value">1790.4 ms</div><div class="hint">Limit &lt;= 8000 ms</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h2>Playwright Console Summary</h2>
+      <p class="note">1 passed · 0 failed · 0 skipped · 7.2 s</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h2>Concurrent Core Web Vitals</h2>
+      <p class="note">Collected from real Chromium sessions. LCP is sampled from the browser's largest-contentful-paint performance entries before the first interaction; other vitals use the web-vitals hooks.</p>
+      <div class="table-wrap"><table>
+        <thead>
+          <tr><th>Vital</th><th>Samples</th><th>min</th><th>median</th><th>p95</th><th>p99</th></tr>
+        </thead>
+        <tbody><tr>
+        <td><strong>FCP</strong><div class="note">First Contentful Paint</div></td>
+        <td>30</td>
+        <td>504 ms</td>
+        <td>550.1 ms</td>
+        <td>584.2 ms</td>
+        <td>584.2 ms</td>
+      </tr><tr>
+        <td><strong>LCP</strong><div class="note">Largest Contentful Paint</div></td>
+        <td>30</td>
+        <td>636 ms</td>
+        <td>713.5 ms</td>
+        <td>820.7 ms</td>
+        <td>907 ms</td>
+      </tr><tr>
+        <td><strong>CLS</strong><div class="note">Cumulative Layout Shift</div></td>
+        <td>30</td>
+        <td>0.000</td>
+        <td>0.000</td>
+        <td>0.000</td>
+        <td>0.000</td>
+      </tr><tr>
+        <td><strong>TTFB</strong><div class="note">Time To First Byte</div></td>
+        <td>30</td>
+        <td>81.4 ms</td>
+        <td>104.6 ms</td>
+        <td>159.2 ms</td>
+        <td>183.1 ms</td>
+      </tr><tr>
+        <td><strong>INP</strong><div class="note">Interaction to Next Paint</div></td>
+        <td>30</td>
+        <td>40 ms</td>
+        <td>40 ms</td>
+        <td>47.9 ms</td>
+        <td>56.3 ms</td>
+      </tr></tbody>
+      </table></div>
+      <p class="note">n/a means the browser emitted no sample for that vital in this run. Missing samples fail the corresponding quality gate.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h2>Journey Step Timings (Median vs p95)</h2>
+      <p class="note">Blue bars indicate median; orange bars indicate p95 percentiles across concurrent Playwright virtual users.</p>
+      <div class="bar-row">
+        <div><code>goto-login-page</code></div>
+        <div>
+          <div class="meter "><span style="width:21.9%"></span></div>
+          <div class="meter p95"><span style="width:24.7%"></span></div>
+        </div>
+        <div class="note">med 757.6 ms<br>p95 854.2 ms</div>
+      </div><div class="bar-row">
+        <div><code>login-to-inventory-ready</code></div>
+        <div>
+          <div class="meter "><span style="width:7.3%"></span></div>
+          <div class="meter p95"><span style="width:10.0%"></span></div>
+        </div>
+        <div class="note">med 252.2 ms<br>p95 347.3 ms</div>
+      </div><div class="bar-row">
+        <div><code>add-to-cart-to-badge-updated</code></div>
+        <div>
+          <div class="meter "><span style="width:2.3%"></span></div>
+          <div class="meter p95"><span style="width:3.1%"></span></div>
+        </div>
+        <div class="note">med 80.6 ms<br>p95 106.7 ms</div>
+      </div><div class="bar-row">
+        <div><code>open-cart-to-item-verified</code></div>
+        <div>
+          <div class="meter "><span style="width:2.0%"></span></div>
+          <div class="meter p95"><span style="width:4.6%"></span></div>
+        </div>
+        <div class="note">med 66 ms<br>p95 159.2 ms</div>
+      </div><div class="bar-row">
+        <div><code>open-checkout-form</code></div>
+        <div>
+          <div class="meter "><span style="width:2.0%"></span></div>
+          <div class="meter p95"><span style="width:5.1%"></span></div>
+        </div>
+        <div class="note">med 68.7 ms<br>p95 175.9 ms</div>
+      </div><div class="bar-row">
+        <div><code>checkout-form-to-overview</code></div>
+        <div>
+          <div class="meter "><span style="width:4.7%"></span></div>
+          <div class="meter p95"><span style="width:7.3%"></span></div>
+        </div>
+        <div class="note">med 162.4 ms<br>p95 252.2 ms</div>
+      </div><div class="bar-row">
+        <div><code>checkout-submit-to-confirmation-visible</code></div>
+        <div>
+          <div class="meter "><span style="width:2.4%"></span></div>
+          <div class="meter p95"><span style="width:3.1%"></span></div>
+        </div>
+        <div class="note">med 82.3 ms<br>p95 108.9 ms</div>
+      </div>
+      <table style="margin-top:16px">
+        <thead>
+          <tr><th>Step</th><th>Single VU</th><th>Concurrent Min</th><th>Median</th><th>p95</th><th>p99</th></tr>
+        </thead>
+        <tbody><tr>
+        <td><code>goto-login-page</code></td>
+        <td>3464 ms</td>
+        <td>681 ms</td>
+        <td>757.6 ms</td>
+        <td>854.2 ms</td>
+        <td>963.1 ms</td>
+      </tr><tr>
+        <td><code>login-to-inventory-ready</code></td>
+        <td>388 ms</td>
+        <td>188 ms</td>
+        <td>252.2 ms</td>
+        <td>347.3 ms</td>
+        <td>399.5 ms</td>
+      </tr><tr>
+        <td><code>add-to-cart-to-badge-updated</code></td>
+        <td>98 ms</td>
+        <td>38 ms</td>
+        <td>80.6 ms</td>
+        <td>106.7 ms</td>
+        <td>115.6 ms</td>
+      </tr><tr>
+        <td><code>open-cart-to-item-verified</code></td>
+        <td>83 ms</td>
+        <td>50 ms</td>
+        <td>66 ms</td>
+        <td>159.2 ms</td>
+        <td>165.7 ms</td>
+      </tr><tr>
+        <td><code>open-checkout-form</code></td>
+        <td>57 ms</td>
+        <td>49 ms</td>
+        <td>68.7 ms</td>
+        <td>175.9 ms</td>
+        <td>175.9 ms</td>
+      </tr><tr>
+        <td><code>checkout-form-to-overview</code></td>
+        <td>173 ms</td>
+        <td>137 ms</td>
+        <td>162.4 ms</td>
+        <td>252.2 ms</td>
+        <td>257.3 ms</td>
+      </tr><tr>
+        <td><code>checkout-submit-to-confirmation-visible</code></td>
+        <td>79 ms</td>
+        <td>53 ms</td>
+        <td>82.3 ms</td>
+        <td>108.9 ms</td>
+        <td>111.1 ms</td>
+      </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Enforced Quality Gate Verdicts</h2>
+      <table>
+        <thead>
+          <tr><th>Quality Gate</th><th>Measured Value</th><th>Threshold Limit</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+        <td>Largest Contentful Paint (LCP p95)</td>
+        <td>820.7 ms</td>
+        <td>2500 ms</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>First Contentful Paint (FCP p95)</td>
+        <td>584.2 ms</td>
+        <td>1800 ms</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>Interaction to Next Paint (INP p95)</td>
+        <td>47.9 ms</td>
+        <td>200 ms</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>Time To First Byte (TTFB p95)</td>
+        <td>159.2 ms</td>
+        <td>800 ms</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>Cumulative Layout Shift (CLS p95)</td>
+        <td>0.000</td>
+        <td>0.100</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>Full Journey Duration (p95)</td>
+        <td>1790.4 ms</td>
+        <td>8000 ms</td>
+        <td><span class="ok">PASS</span></td>
+      </tr><tr>
+        <td>Virtual User Failure Count</td>
+        <td>0</td>
+        <td>0</td>
+        <td><span class="ok">PASS</span></td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:24px">
+      <h2>Artillery Console Summary</h2>
+      <p class="note">Final aggregate counters and histogram summaries from this Artillery run.</p>
+      <h3>Counters</h3>
+      <div class="table-wrap"><table>
+        <thead>
+          <tr><th>Metric</th><th>Count</th></tr>
+        </thead>
+        <tbody><tr>
+      <td><code>browser.http_requests</code></td>
+      <td>392</td>
+    </tr><tr>
+      <td><code>browser.page.codes.200</code></td>
+      <td>392</td>
+    </tr><tr>
+      <td><code>browser.page.domcontentloaded</code></td>
+      <td>30</td>
+    </tr><tr>
+      <td><code>browser.page.domcontentloaded.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+    </tr><tr>
+      <td><code>vusers.completed</code></td>
+      <td>30</td>
+    </tr><tr>
+      <td><code>vusers.created</code></td>
+      <td>30</td>
+    </tr><tr>
+      <td><code>vusers.created_by_name.sauce-demo-purchase</code></td>
+      <td>30</td>
+    </tr><tr>
+      <td><code>vusers.failed</code></td>
+      <td>0</td>
+    </tr></tbody>
+      </table></div>
+      <h3>Histograms</h3>
+      <div class="table-wrap"><table>
+        <thead>
+          <tr><th>Metric</th><th>Samples</th><th>min</th><th>max</th><th>mean</th><th>median</th><th>p95</th><th>p99</th></tr>
+        </thead>
+        <tbody><tr>
+      <td><code>browser.custom.total_journey_duration</code></td>
+      <td>30</td>
+      <td>1353</td>
+      <td>2200</td>
+      <td>1568.6</td>
+      <td>1525.7</td>
+      <td>1790.4</td>
+      <td>1901.1</td>
+    </tr><tr>
+      <td><code>browser.memory_used_mb</code></td>
+      <td>30</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10.1</td>
+      <td>10.1</td>
+      <td>10.1</td>
+    </tr><tr>
+      <td><code>browser.page.CLS.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr><tr>
+      <td><code>browser.page.FCP.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>504</td>
+      <td>624</td>
+      <td>553.5</td>
+      <td>550.1</td>
+      <td>584.2</td>
+      <td>584.2</td>
+    </tr><tr>
+      <td><code>browser.page.INP.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>40</td>
+      <td>64</td>
+      <td>43.2</td>
+      <td>40</td>
+      <td>47.9</td>
+      <td>56.3</td>
+    </tr><tr>
+      <td><code>browser.page.LCP.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>636</td>
+      <td>968</td>
+      <td>736.5</td>
+      <td>713.5</td>
+      <td>820.7</td>
+      <td>907</td>
+    </tr><tr>
+      <td><code>browser.page.TTFB.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>81.4</td>
+      <td>195</td>
+      <td>115.4</td>
+      <td>104.6</td>
+      <td>159.2</td>
+      <td>183.1</td>
+    </tr><tr>
+      <td><code>browser.page.dominteractive</code></td>
+      <td>30</td>
+      <td>103</td>
+      <td>222</td>
+      <td>138.7</td>
+      <td>127.8</td>
+      <td>183.1</td>
+      <td>206.5</td>
+    </tr><tr>
+      <td><code>browser.page.dominteractive.https://www.saucedemo.com/</code></td>
+      <td>30</td>
+      <td>103</td>
+      <td>222</td>
+      <td>138.7</td>
+      <td>127.8</td>
+      <td>183.1</td>
+      <td>206.5</td>
+    </tr><tr>
+      <td><code>browser.step.add-to-cart-to-badge-updated</code></td>
+      <td>30</td>
+      <td>38</td>
+      <td>130</td>
+      <td>77.9</td>
+      <td>80.6</td>
+      <td>106.7</td>
+      <td>115.6</td>
+    </tr><tr>
+      <td><code>browser.step.checkout-form-to-overview</code></td>
+      <td>30</td>
+      <td>137</td>
+      <td>621</td>
+      <td>186</td>
+      <td>162.4</td>
+      <td>252.2</td>
+      <td>257.3</td>
+    </tr><tr>
+      <td><code>browser.step.checkout-submit-to-confirmation-visible</code></td>
+      <td>30</td>
+      <td>53</td>
+      <td>177</td>
+      <td>84.4</td>
+      <td>82.3</td>
+      <td>108.9</td>
+      <td>111.1</td>
+    </tr><tr>
+      <td><code>browser.step.goto-login-page</code></td>
+      <td>30</td>
+      <td>681</td>
+      <td>1013</td>
+      <td>774.4</td>
+      <td>757.6</td>
+      <td>854.2</td>
+      <td>963.1</td>
+    </tr><tr>
+      <td><code>browser.step.login-to-inventory-ready</code></td>
+      <td>30</td>
+      <td>188</td>
+      <td>541</td>
+      <td>276.7</td>
+      <td>252.2</td>
+      <td>347.3</td>
+      <td>399.5</td>
+    </tr><tr>
+      <td><code>browser.step.open-cart-to-item-verified</code></td>
+      <td>30</td>
+      <td>50</td>
+      <td>180</td>
+      <td>79</td>
+      <td>66</td>
+      <td>159.2</td>
+      <td>165.7</td>
+    </tr><tr>
+      <td><code>browser.step.open-checkout-form</code></td>
+      <td>30</td>
+      <td>49</td>
+      <td>177</td>
+      <td>89.8</td>
+      <td>68.7</td>
+      <td>175.9</td>
+      <td>175.9</td>
+    </tr><tr>
+      <td><code>vusers.session_length</code></td>
+      <td>30</td>
+      <td>1545.2</td>
+      <td>2386.6</td>
+      <td>1781.3</td>
+      <td>1720.2</td>
+      <td>2143.5</td>
+      <td>2143.5</td>
+    </tr></tbody>
+      </table></div>
+    </div>
+    <footer>Reports: dashboard.html, SUMMARY.md, artillery-report.json in this run folder.</footer>
+  
+  </div>
+</body>
+</html>
